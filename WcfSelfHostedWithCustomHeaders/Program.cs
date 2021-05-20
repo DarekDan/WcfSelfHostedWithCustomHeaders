@@ -20,7 +20,7 @@ namespace WcfSelfHostedWithCustomHeaders
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 
-            Uri baseAddress = new Uri("http://localhost:8181/hello");
+            Uri baseAddress = new Uri(@"http://localhost:8181/hello");
 
             using (ServiceHost host = new ServiceHost(typeof(HelloWorldService), baseAddress))
             {
@@ -58,27 +58,7 @@ namespace WcfSelfHostedWithCustomHeaders
     {
         public string SayHello(string name)
         {
-            return string.Format("Hello, {0}", name);
-        }
-    }
-
-    [DataContract]
-    public class CustomHeader
-    {
-        [DataMember]
-        public string WebUserId { get; set; }
-        [DataMember]
-        public int WebNodeId { get; set; }
-        [DataMember]
-        public Guid WebSessionId { get; set; }
-    }
-
-    public static class ClientCustomHeaderContext
-    {
-        public static CustomHeader HeaderInformation { get; } = new CustomHeader();
-
-        static ClientCustomHeaderContext()
-        {
+            return $"Hello, {name}";
         }
     }
 
