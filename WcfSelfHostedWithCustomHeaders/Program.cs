@@ -8,13 +8,18 @@ using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
+using Serilog.Core;
 
 namespace WcfSelfHostedWithCustomHeaders
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+
             Uri baseAddress = new Uri("http://localhost:8181/hello");
 
             using (ServiceHost host = new ServiceHost(typeof(HelloWorldService), baseAddress))
@@ -31,8 +36,7 @@ namespace WcfSelfHostedWithCustomHeaders
                 // by the service.
                 host.Open();
 
-                Console.WriteLine("The service is ready at {0}", baseAddress);
-                Console.WriteLine("Press <Enter> to stop the service.");
+                Log.Information($"The service is ready at {baseAddress}\nPress <Enter> to stop the service." );
                 Console.ReadLine();
 
                 // Close the ServiceHost.
@@ -87,8 +91,8 @@ namespace WcfSelfHostedWithCustomHeaders
         }
         public object AfterReceiveRequest(ref Message request, IClientChannel channel, InstanceContext instanceContext)
         {
-            string displayText = $"Server has received the following message:\n{request}\n";
-            Console.WriteLine(displayText);
+            string displayText = $"Server has received the following message:\nHEADERS:\n{((HttpRequestMessageProperty)request.Properties["httpRequest"])?.Headers}\n{request}\n";
+            Log.Information(displayText);
             return null;
         }
 
@@ -104,7 +108,7 @@ namespace WcfSelfHostedWithCustomHeaders
             }
 
             string displayText = $"Server has replied the following message:\nHEADERS:\n{httpHeader.Headers}\n{reply}\n";
-            Console.WriteLine(displayText);
+            Log.Information(displayText);
 
         }
     }
